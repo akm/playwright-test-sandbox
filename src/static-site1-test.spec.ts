@@ -1,29 +1,16 @@
 import {test, expect, Page} from '@playwright/test';
 
-import {spawn, ChildProcess, execSync} from 'child_process';
-import {join} from 'path';
-
 import {Locator} from 'playwright';
+
+import {StaticHttpServer} from './StaticHttpServer';
 
 const serverPort = 5000;
 const targetUrl = `http://localhost:${serverPort}`;
 
-let serverProcess: ChildProcess;
-test.beforeAll(() => {
-  // https://github.com/lukeed/sirv/tree/master/packages/sirv-cli
-  serverProcess = spawn(
-    '$(npm bin)/sirv',
-    [join(__dirname, 'static-site1'), '--port', serverPort.toString()],
-    {
-      shell: true,
-    }
-  );
-  // https://github.com/jeffbski/wait-on
-  execSync(`$(npm bin)/wait-on ${targetUrl} --delay 1000 --httpTimeout 30000`);
-});
-test.afterAll(() => {
-  if (serverProcess) serverProcess.kill('SIGINT');
-});
+const server = new StaticHttpServer(serverPort);
+
+test.beforeAll(() => server.start());
+test.afterAll(() => server.stop());
 
 test.beforeEach(async ({page}) => {
   await page.goto(targetUrl);
