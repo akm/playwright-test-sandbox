@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
+    "test:headed": "playwright test --headed",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
